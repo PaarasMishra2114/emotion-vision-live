@@ -28,12 +28,64 @@ const Index = () => {
   const [uploadPreview, setUploadPreview] = useState<string | null>(null);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
 
-  const toggleActive = useCallback(() => {
-    if (!active) {
-      setUploadPreview(null);
-      setActive(true);
+  const processResponse = (data: any) => {
+    if (data.emotion && data.emotion !== "UNKNOWN") {
+      const dominant = data.emotion.toLowerCase() as EmotionKey;
+      if (EMOTIONS.includes(dominant)) {
+        const fakeScores = Object.fromEntries(EMOTIONS.map(e => [e, 0])) as Record<EmotionKey, number>;
+        fakeScores[dominant] = data.confidence || 0;
+        for (const e of EMOTIONS) {
+           if (e !== dominant) {
+              fakeScores[e] = Math.random() * 15;
+           }
+        }
+        const detectedFace: FaceData = {
+          region: data.bbox || { x: 200, y: 150, w: 200, h: 250 },
+          dominant_emotion: dominant,
+          emotion: fakeScores,
+          age: 26,
+          gender: "Detected",
+          landmarks: []
+        };
+        setFaces([detectedFace]);
+        setDominantEmotion(dominant);
+        document.documentElement.style.setProperty("--dom-color", EMOTION_HSL[dominant]);
+        setHistory(prev => {
+          const next = { ...prev };
+          for (const e of EMOTIONS) {
+            next[e] = [...prev[e].slice(-(MAX_HISTORY - 1)), detectedFace.emotion[e]];
+          }
+          return next;
+        });
+        setHistoryFlat(prev => [...prev.slice(-(MAX_HISTORY - 1)), { t: Date.now(), ...detectedFace.emotion }]);
+      }
     } else {
+       setFaces([]);
+    }
+  };
+
+
+  const toggleActive = useCallback(async () => {
+    if (!active) {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        if (videoRef.current) videoRef.current.srcObject = stream;
+        streamRef.current = stream;
+        setUploadPreview(null);
+        setActive(true);
+      } catch (err) {
+        console.error("Camera error", err);
+        alert("Need camera permissions!");
+      }
+    } else {
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(t => t.stop());
+        streamRef.current = null;
+      }
       setFaces([]);
       setActive(false);
     }
@@ -56,46 +108,7 @@ const Index = () => {
         body: formData,
       });
       const data = await res.json();
-      
-      if (data.emotion && data.emotion !== "UNKNOWN") {
-        const dominant = data.emotion.toLowerCase() as EmotionKey;
-        if (EMOTIONS.includes(dominant)) {
-          const fakeScores = Object.fromEntries(EMOTIONS.map(e => [e, 0])) as Record<EmotionKey, number>;
-          fakeScores[dominant] = data.confidence || 0;
-          for (const e of EMOTIONS) {
-             if (e !== dominant) {
-                fakeScores[e] = Math.random() * 15;
-             }
-          }
-
-          const detectedFace: FaceData = {
-            region: { x: 200, y: 150, w: 200, h: 250 },
-            dominant_emotion: dominant,
-            emotion: fakeScores,
-            age: 26,
-            gender: "Detected",
-            landmarks: []
-          };
-          
-          setFaces([detectedFace]);
-          setDominantEmotion(dominant);
-          document.documentElement.style.setProperty("--dom-color", EMOTION_HSL[dominant]);
-          
-          setHistory(prev => {
-            const next = { ...prev };
-            for (const e of EMOTIONS) {
-              next[e] = [...prev[e].slice(-(MAX_HISTORY - 1)), detectedFace.emotion[e]];
-            }
-            return next;
-          });
-          
-          setHistoryFlat(prev => {
-             return [...prev.slice(-(MAX_HISTORY - 1)), { t: Date.now(), ...detectedFace.emotion }];
-          });
-        }
-      } else {
-         setFaces([]);
-      }
+      processResponse(data);
     } catch (err) {
        console.error("API error", err);
     }
@@ -106,47 +119,27 @@ const Index = () => {
     if (active) {
       interval = setInterval(async () => {
         try {
-          const res = await fetch(`${API_URL}/get_emotion_data`);
-          const data = await res.json();
-          if (data.emotion && data.emotion !== "UNKNOWN") {
-            const dominant = data.emotion.toLowerCase() as EmotionKey;
-            if (EMOTIONS.includes(dominant)) {
-              const fakeScores = Object.fromEntries(EMOTIONS.map(e => [e, 0])) as Record<EmotionKey, number>;
-              fakeScores[dominant] = data.confidence || 0;
-              for (const e of EMOTIONS) {
-                 if (e !== dominant) {
-                    fakeScores[e] = Math.random() * 15;
-                 }
-              }
-
-              const detectedFace: FaceData = {
-                region: { x: 200, y: 150, w: 200, h: 250 },
-                dominant_emotion: dominant,
-                emotion: fakeScores,
-                age: 26,
-                gender: "Detected",
-                landmarks: []
-              };
-              
-              setFaces([detectedFace]);
-              setDominantEmotion(dominant);
-              document.documentElement.style.setProperty("--dom-color", EMOTION_HSL[dominant]);
-
-              setHistory(prev => {
-                const next = { ...prev };
-                for (const e of EMOTIONS) {
-                  next[e] = [...prev[e].slice(-(MAX_HISTORY - 1)), detectedFace.emotion[e]];
-                }
-                return next;
-              });
-              
-              setHistoryFlat(prev => {
-                 return [...prev.slice(-(MAX_HISTORY - 1)), { t: Date.now(), ...detectedFace.emotion }];
-              });
-            }
-          } else {
-             setFaces([]);
-          }
+          if (!videoRef.current || !canvasRef.current) return;
+          const video = videoRef.current;
+          const canvas = canvasRef.current;
+          canvas.width = video.videoWidth || 640;
+          canvas.height = video.videoHeight || 480;
+          if (canvas.width === 0) return;
+          
+          const ctx = canvas.getContext('2d');
+          ctx?.drawImage(video, 0, 0, canvas.width, canvas.height);
+          
+          canvas.toBlob(async (blob) => {
+            if (!blob) return;
+            const formData = new FormData();
+            formData.append("image", blob, "frame.jpg");
+            const res = await fetch(`${API_URL}/analyze_image`, {
+              method: "POST",
+              body: formData,
+            });
+            const data = await res.json();
+            processResponse(data);
+          }, 'image/jpeg', 0.7);
         } catch (err) {
            console.error("API error", err);
         }
@@ -234,9 +227,26 @@ const Index = () => {
             <div className="relative overflow-hidden rounded-lg border border-border bg-muted flex items-center justify-center min-h-[480px]">
               {uploadPreview ? (
                 <img src={uploadPreview} className="block w-full object-contain h-full max-h-[480px]" alt="Uploaded" />
-              ) : active ? (
-                <img src={`${API_URL}/video_feed`} className="block w-full object-cover" alt="Video stream" />
               ) : (
+                <>
+                  <video ref={videoRef} autoPlay playsInline muted className={`block w-full object-cover h-full max-h-[480px] ${!active && 'hidden'}`} />
+                  <canvas ref={canvasRef} className="hidden" />
+                  {!active && <span className="font-display text-sm text-muted-foreground tracking-wider">PRESS START OR UPLOAD AN IMAGE</span>}
+                  
+                  {faces[0]?.region && faces[0].region.w > 0 && active && showLandmarks && videoRef.current && (
+                     <div
+                       className="absolute border-2 transition-all duration-100"
+                       style={{
+                         borderColor: EMOTION_COLORS[dominantEmotion],
+                         left: `${(faces[0].region.x / videoRef.current.videoWidth) * 100}%`,
+                         top: `${(faces[0].region.y / videoRef.current.videoHeight) * 100}%`,
+                         width: `${(faces[0].region.w / videoRef.current.videoWidth) * 100}%`,
+                         height: `${(faces[0].region.h / videoRef.current.videoHeight) * 100}%`,
+                       }}
+                     />
+                  )}
+                </>
+              )}
                 <span className="font-display text-sm text-muted-foreground tracking-wider">
                   PRESS START OR UPLOAD AN IMAGE
                 </span>

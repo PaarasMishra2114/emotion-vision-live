@@ -137,6 +137,7 @@ def analyze_image():
     
     detected_emotion = "UNKNOWN"
     detected_confidence = 0.0
+    detected_bbox = None
     
     for (x, y, w, h) in faces:
         face_roi = gray[y:y+h, x:x+w]
@@ -149,9 +150,10 @@ def analyze_image():
             
             detected_emotion = class_names[label_id]
             detected_confidence = mapped_confidence
+            detected_bbox = {"x": int(x), "y": int(y), "w": int(w), "h": int(h)}
             break # Just analyze the first face found
             
-    res = jsonify({"emotion": detected_emotion, "confidence": detected_confidence})
+    res = jsonify({"emotion": detected_emotion, "confidence": detected_confidence, "bbox": detected_bbox})
     res.headers.add('Access-Control-Allow-Origin', '*')
     return res
 
