@@ -164,7 +164,7 @@ const Index = () => {
           <div className="flex items-center gap-3">
             <Activity className="h-6 w-6 text-primary text-glow" />
             <h1 className="font-display text-xl font-bold tracking-wider text-foreground">
-              EMOTION<span className="text-primary">VISION</span>
+              EMO<span className="text-primary">DETECTION</span>
             </h1>
             <span className="rounded border border-border bg-secondary px-2 py-0.5 font-mono-tech text-[10px] text-muted-foreground">
               v2.0 (LIVE API)
@@ -244,29 +244,29 @@ const Index = () => {
 
             {/* Dominant emotion banner */}
             <div
-              className="flex items-center justify-between rounded-lg border border-border p-4 transition-all duration-300"
-              style={{
+              className={`flex items-center justify-between rounded-lg border p-4 transition-all duration-300 ${faces.length === 0 ? 'border-border opacity-50' : ''}`}
+              style={faces.length > 0 ? {
                 borderColor: EMOTION_COLORS[dominantEmotion],
                 boxShadow: `0 0 20px ${EMOTION_COLORS[dominantEmotion]}33`,
-              }}
+              } : {}}
             >
               <div>
                 <span className="font-mono-tech text-[10px] text-muted-foreground">DOMINANT EMOTION</span>
                 <div
                   className="font-display text-2xl font-bold uppercase tracking-widest"
-                  style={{ color: EMOTION_COLORS[dominantEmotion] }}
+                  style={{ color: faces.length > 0 ? EMOTION_COLORS[dominantEmotion] : 'currentColor' }}
                 >
-                  {dominantEmotion}
+                  {faces.length > 0 ? dominantEmotion : "NO FACE"}
                 </div>
               </div>
               <div
                 className="rounded-full px-4 py-1 font-display text-sm font-bold"
                 style={{
-                  background: EMOTION_COLORS[dominantEmotion],
-                  color: '#000',
+                  background: faces.length > 0 ? EMOTION_COLORS[dominantEmotion] : 'var(--muted)',
+                  color: faces.length > 0 ? '#000' : 'currentColor',
                 }}
               >
-                {currentScores[dominantEmotion]?.toFixed(1)}%
+                {faces.length > 0 ? currentScores[dominantEmotion]?.toFixed(1) : "0.0"}%
               </div>
             </div>
 
