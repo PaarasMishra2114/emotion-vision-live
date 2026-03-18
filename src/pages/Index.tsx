@@ -1,7 +1,7 @@
 import { useState, useCallback, useRef } from "react";
 import { Camera, CameraOff, Eye, EyeOff, Activity, Zap, Cpu, Gauge } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import WebcamCanvas from "@/components/WebcamCanvas";
+import WebcamCanvas, { type WebcamCanvasHandle } from "@/components/WebcamCanvas";
 import StatusPill from "@/components/StatusPill";
 import FaceCard from "@/components/FaceCard";
 import EmotionRadar from "@/components/EmotionRadar";
@@ -27,24 +27,27 @@ const Index = () => {
   const [historyFlat, setHistoryFlat] = useState<HistoryPoint[]>([]);
   const [fps, setFps] = useState(0);
   const frameCountRef = useRef(0);
+  const webcamRef = useRef<WebcamCanvasHandle>(null);
   const fpsIntervalRef = useRef<ReturnType<typeof setInterval>>();
 
-  // Start FPS counter when activated
-  const toggleActive = useCallback(() => {
-    setActive(prev => {
-      if (!prev) {
+  const toggleActive = useCallback(async () => {
+    if (!active) {
+      // Start camera from user gesture
+      await webcamRef.current?.startCamera();
+      frameCountRef.current = 0;
+      fpsIntervalRef.current = setInterval(() => {
+        setFps(frameCountRef.current);
         frameCountRef.current = 0;
-        fpsIntervalRef.current = setInterval(() => {
-          setFps(frameCountRef.current);
-          frameCountRef.current = 0;
-        }, 1000);
-      } else {
-        clearInterval(fpsIntervalRef.current);
-        setFps(0);
-      }
-      return !prev;
-    });
-  }, []);
+      }, 1000);
+      setActive(true);
+    } else {
+      webcamRef.current?.stopCamera();
+      clearInterval(fpsIntervalRef.current);
+      setFps(0);
+      setFaces([]);
+      setActive(false);
+    }
+  }, [active]);
 
   const handleFrame = useCallback((video: HTMLVideoElement) => {
     frameCountRef.current++;
@@ -150,6 +153,7 @@ const Index = () => {
           {/* Webcam - 2 cols */}
           <div className="lg:col-span-2 space-y-4">
             <WebcamCanvas
+              ref={webcamRef}
               onFrame={handleFrame}
               faces={faces}
               active={active}
