@@ -155,6 +155,12 @@ def analyze_image():
     res.headers.add('Access-Control-Allow-Origin', '*')
     return res
 
+@app.route('/')
+def home():
+    res = jsonify({"message": "Emotion API Backend is running perfectly!", "status": "online"})
+    res.headers.add('Access-Control-Allow-Origin', '*')
+    return res
+
 @app.route('/get_emotion_data')
 def get_emotion_data():
     with lock:
