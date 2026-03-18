@@ -247,10 +247,6 @@ const Index = () => {
                   )}
                 </>
               )}
-                <span className="font-display text-sm text-muted-foreground tracking-wider">
-                  PRESS START OR UPLOAD AN IMAGE
-                </span>
-              )}
             </div>
 
             {/* Dominant emotion banner */}
