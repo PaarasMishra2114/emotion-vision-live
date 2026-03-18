@@ -26,6 +26,7 @@ const Index = () => {
   );
   const [historyFlat, setHistoryFlat] = useState<HistoryPoint[]>([]);
   const [fps, setFps] = useState(0);
+  const frameCountRef = useRef(0);
   const webcamRef = useRef<WebcamCanvasHandle>(null);
   const fpsIntervalRef = useRef<ReturnType<typeof setInterval>>();
 
