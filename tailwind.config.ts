@@ -13,6 +13,10 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        display: ['Orbitron', 'sans-serif'],
+        mono: ['Share Tech Mono', 'monospace'],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -47,6 +51,16 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        emotion: {
+          angry: "hsl(var(--emotion-angry))",
+          disgust: "hsl(var(--emotion-disgust))",
+          fear: "hsl(var(--emotion-fear))",
+          happy: "hsl(var(--emotion-happy))",
+          sad: "hsl(var(--emotion-sad))",
+          surprise: "hsl(var(--emotion-surprise))",
+          neutral: "hsl(var(--emotion-neutral))",
+        },
+        dom: "hsl(var(--dom-color))",
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
