@@ -40,7 +40,7 @@ const Index = () => {
         fakeScores[dominant] = data.confidence || 0;
         for (const e of EMOTIONS) {
            if (e !== dominant) {
-              fakeScores[e] = Math.random() * 15;
+              fakeScores[e] = (faces[0]?.emotion[e] || 0) * 0.8 + (Math.random() * 3);
            }
         }
         const detectedFace: FaceData = {
