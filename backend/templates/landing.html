@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EmoDetection | The Future of Emotional Intelligence</title>
+<!-- Google Fonts: Space Grotesk -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS with Plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration -->
+<script data-purpose="tailwind-config">
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              DEFAULT: '#ff4d00',
+              glow: 'rgba(255, 77, 0, 0.4)',
+              dark: '#1a0800',
+            },
+            dark: {
+              900: '#050505',
+              800: '#0a0a0a',
+              700: '#121212',
+            }
+          },
+          fontFamily: {
+            sans: ['Space Grotesk', 'sans-serif'],
+          },
+          borderRadius: {
+            'custom': '1rem', // ROUND_FOUR
+          },
+          animation: {
+            'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'float': 'float 6s ease-in-out infinite',
+            'scan': 'scan 3s linear infinite',
+          },
+          keyframes: {
+            float: {
+              '0%, 100%': { transform: 'translateY(0)' },
+              '50%': { transform: 'translateY(-20px)' },
+            },
+            scan: {
+              '0%': { top: '0%' },
+              '100%': { top: '100%' },
+            }
+          }
+        }
+      }
+    }
+  </script>
+<style data-purpose="custom-css">
+    body {
+      background-color: #050505;
+      color: #ffffff;
+      overflow-x: hidden;
+    }
+
+    .glass {
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .glass-brand {
+      background: rgba(255, 77, 0, 0.05);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 77, 0, 0.2);
+    }
+
+    .glow-text {
+      text-shadow: 0 0 15px rgba(255, 77, 0, 0.6), 0 0 30px rgba(255, 77, 0, 0.2);
+    }
+
+    .circuit-bg {
+      background-image: radial-gradient(circle at 2px 2px, rgba(255, 77, 0, 0.15) 1px, transparent 0);
+      background-size: 40px 40px;
+    }
+
+    .bioluminescent-line {
+      box-shadow: 0 0 15px #ff4d00;
+    }
+
+    /* Scrollbar Styling */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #050505;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #ff4d00;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body class="font-sans antialiased">
+<!-- BEGIN: Navigation -->
+<nav class="fixed top-0 w-full z-50 px-6 py-4 flex justify-between items-center glass border-b border-white/5" data-purpose="main-nav">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 bg-brand rounded-full bioluminescent-line flex items-center justify-center">
+<div class="w-4 h-4 bg-dark-900 rounded-full animate-pulse"></div>
+</div>
+<span class="text-xl font-bold tracking-tighter uppercase glow-text">EMO<span class="text-brand">DETECTION</span></span>
+</div>
+<div class="hidden md:flex items-center gap-8 text-sm font-medium tracking-widest uppercase">
+<a class="hover:text-brand transition-colors" href="#how-it-works">Mechanism</a>
+<a class="hover:text-brand transition-colors" href="#analytics">Analytics</a>
+<a class="hover:text-brand transition-colors" href="#footer">Contact</a>
+</div>
+<a href="/login" class="px-5 py-2 rounded-custom border border-brand/50 text-brand text-xs font-bold uppercase tracking-widest hover:bg-brand hover:text-white transition-all text-center">
+      Login
+    </a>
+</nav>
+<!-- END: Navigation -->
+<!-- BEGIN: HeroSection -->
+<section class="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden" data-purpose="hero-section">
+<!-- Ambient Background Elements -->
+<div class="absolute inset-0 z-0">
+<div class="absolute top-1/4 -left-20 w-96 h-96 bg-brand/20 rounded-full blur-[120px] animate-pulse-slow"></div>
+<div class="absolute bottom-1/4 -right-20 w-96 h-96 bg-red-600/10 rounded-full blur-[120px] animate-pulse-slow"></div>
+<div class="absolute inset-0 circuit-bg opacity-30"></div>
+</div>
+<div class="container mx-auto px-6 relative z-10 text-center">
+<div class="inline-block px-4 py-1 rounded-full glass border border-brand/30 text-brand text-[10px] uppercase tracking-[0.3em] mb-8 animate-bounce">
+        Neural Processing Online
+      </div>
+<h1 class="text-5xl md:text-8xl font-bold mb-6 tracking-tighter leading-none">
+        The Future of <br/>
+<span class="text-transparent bg-clip-text bg-gradient-to-r from-brand to-red-500 glow-text">Emotional Intelligence</span>
+</h1>
+<p class="max-w-2xl mx-auto text-gray-400 text-lg md:text-xl mb-12 font-light">
+        Decode human sentiment through high-fidelity neural scans. Real-time emotional mapping powered by biometric synthesis.
+      </p>
+<div class="flex flex-col md:flex-row items-center justify-center gap-4">
+<a href="/login" class="glass-brand group relative px-8 py-4 rounded-custom text-white font-bold text-md uppercase tracking-widest overflow-hidden transition-all hover:scale-105 active:scale-95 text-center" data-purpose="cta-button-login">
+<span class="relative z-10">Secure Login</span>
+<div class="absolute inset-0 bg-gradient-to-r from-brand to-red-600 opacity-0 group-hover:opacity-20 transition-opacity"></div>
+</a>
+<a href="/dashboard" class="glass group relative px-8 py-4 rounded-custom text-gray-300 border-white/10 font-bold text-md uppercase tracking-widest overflow-hidden transition-all hover:border-brand/50 hover:text-white hover:scale-105 active:scale-95 text-center" data-purpose="cta-button-guest">
+<span class="relative z-10">Quick Scan (Guest)</span>
+</a>
+</div>
+<div class="flex items-center justify-center mt-8 gap-4 text-xs font-mono text-brand/80">
+<span class="w-12 h-[1px] bg-brand/50"></span>
+          SCIENTIFIC PROTOCOL V.4.0
+        </div>
+</div>
+<!-- UI Ornament: Floating Elements -->
+<div class="absolute bottom-10 left-10 hidden lg:block animate-float">
+<div class="glass p-4 rounded-custom border-l-4 border-brand">
+<p class="text-[10px] text-brand uppercase mb-2 font-bold tracking-widest">Active Nodes</p>
+<div class="flex gap-1">
+<div class="w-1 h-4 bg-brand rounded-full"></div>
+<div class="w-1 h-6 bg-brand/60 rounded-full"></div>
+<div class="w-1 h-3 bg-brand/80 rounded-full"></div>
+<div class="w-1 h-5 bg-brand rounded-full"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- END: HeroSection -->
+<!-- BEGIN: HowItWorks -->
+<section class="py-24 relative bg-dark-800" data-purpose="how-it-works" id="how-it-works">
+<div class="absolute inset-0 circuit-bg opacity-10"></div>
+<div class="container mx-auto px-6 relative z-10">
+<div class="mb-16 text-center">
+<h2 class="text-3xl md:text-5xl font-bold glow-text mb-4 uppercase">The Mechanism</h2>
+<div class="w-24 h-1 bg-brand mx-auto bioluminescent-line"></div>
+</div>
+<div class="grid md:grid-cols-3 gap-8">
+<!-- Feature 1 -->
+<div class="glass p-8 rounded-custom border border-white/5 group hover:border-brand/40 transition-all">
+<div class="w-12 h-12 rounded-lg bg-brand/20 flex items-center justify-center mb-6 text-brand">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<h3 class="text-xl font-bold mb-3 uppercase tracking-wider group-hover:text-brand transition-colors">Bio-Pulse Sync</h3>
+<p class="text-gray-500 text-sm leading-relaxed">
+            Detect subtle physiological shifts via high-frequency pulse-mapping sensors integrated into optical feeds.
+          </p>
+</div>
+<!-- Feature 2 -->
+<div class="glass p-8 rounded-custom border border-white/5 group hover:border-brand/40 transition-all">
+<div class="w-12 h-12 rounded-lg bg-brand/20 flex items-center justify-center mb-6 text-brand">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<h3 class="text-xl font-bold mb-3 uppercase tracking-wider group-hover:text-brand transition-colors">Micro-Expression</h3>
+<p class="text-gray-500 text-sm leading-relaxed">
+            Our AI analyzes facial muscle twitches at 240 frames per second to reveal hidden emotional states.
+          </p>
+</div>
+<!-- Feature 3 -->
+<div class="glass p-8 rounded-custom border border-white/5 group hover:border-brand/40 transition-all">
+<div class="w-12 h-12 rounded-lg bg-brand/20 flex items-center justify-center mb-6 text-brand">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<h3 class="text-xl font-bold mb-3 uppercase tracking-wider group-hover:text-brand transition-colors">Neural Decoding</h3>
+<p class="text-gray-500 text-sm leading-relaxed">
+            Real-time cross-referencing of biometric data with a global database of emotional linguistic patterns.
+          </p>
+</div>
+</div>
+</div>
+</section>
+<!-- END: HowItWorks -->
+<!-- BEGIN: AdvancedAnalytics -->
+<section class="py-24 relative overflow-hidden" data-purpose="advanced-analytics" id="analytics">
+<div class="container mx-auto px-6">
+<div class="grid lg:grid-cols-2 gap-16 items-center">
+<div>
+<h2 class="text-4xl md:text-5xl font-bold mb-6 glow-text uppercase leading-tight">Advanced <br/><span class="text-brand">Neural Analytics</span></h2>
+<p class="text-gray-400 mb-8 text-lg">
+            Experience deep-data visualization that transforms raw emotional output into actionable intelligence. Our analytics engine interprets complex psychological landscapes with 99.4% precision.
+          </p>
+<ul class="space-y-4">
+<li class="flex items-start gap-4">
+<span class="mt-1 w-2 h-2 rounded-full bg-brand bioluminescent-line"></span>
+<span class="text-sm font-medium text-gray-300">Predictive Sentiment Trajectory Mapping</span>
+</li>
+<li class="flex items-start gap-4">
+<span class="mt-1 w-2 h-2 rounded-full bg-brand bioluminescent-line"></span>
+<span class="text-sm font-medium text-gray-300">Subconscious Bias Detection Overlays</span>
+</li>
+<li class="flex items-start gap-4">
+<span class="mt-1 w-2 h-2 rounded-full bg-brand bioluminescent-line"></span>
+<span class="text-sm font-medium text-gray-300">Biometric Authenticity Verification</span>
+</li>
+</ul>
+</div>
+<div class="relative">
+<!-- Glassmorphic Data UI -->
+<div class="glass p-6 rounded-custom border-white/10 relative overflow-hidden aspect-video">
+<div class="flex justify-between items-center mb-8">
+<div class="text-xs font-mono text-brand uppercase tracking-tighter">Live Emotional Waveform</div>
+<div class="text-[10px] text-gray-500">STABLE CONNECTION</div>
+</div>
+<canvas class="w-full h-48" data-purpose="animated-graph" id="analyticsCanvas"></canvas>
+<div class="mt-8 grid grid-cols-4 gap-4">
+<div class="text-center">
+<div class="text-brand font-bold text-xl">84%</div>
+<div class="text-[8px] text-gray-500 uppercase">Arousal</div>
+</div>
+<div class="text-center">
+<div class="text-red-500 font-bold text-xl">12%</div>
+<div class="text-[8px] text-gray-500 uppercase">Distress</div>
+</div>
+<div class="text-center">
+<div class="text-blue-400 font-bold text-xl">67%</div>
+<div class="text-[8px] text-gray-500 uppercase">Focus</div>
+</div>
+<div class="text-center">
+<div class="text-brand font-bold text-xl">91%</div>
+<div class="text-[8px] text-gray-500 uppercase">Valence</div>
+</div>
+</div>
+<!-- Scan Line Effect -->
+<div class="absolute inset-0 bg-gradient-to-b from-brand/10 to-transparent h-1 w-full animate-scan opacity-20 pointer-events-none"></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- END: AdvancedAnalytics -->
+<!-- BEGIN: CallToAction -->
+<section class="py-24 relative" data-purpose="cta-section">
+<div class="container mx-auto px-6">
+<div class="glass-brand rounded-custom p-12 text-center relative overflow-hidden border-brand/40">
+<div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-brand to-transparent"></div>
+<h2 class="text-4xl md:text-6xl font-bold mb-6 glow-text uppercase">Ready to Decode?</h2>
+<p class="text-gray-300 max-w-xl mx-auto mb-10 text-lg">
+          Join the elite organizations using EmoDetection to master the human factor. Secure your access to the neural network today.
+        </p>
+<div class="flex flex-col sm:flex-row gap-4 justify-center">
+<input class="bg-black/50 border border-brand/30 rounded-custom px-6 py-4 text-white focus:ring-2 focus:ring-brand focus:border-transparent outline-none min-w-[250px]" placeholder="Enter Neural ID (Email)" type="email"/>
+<a href="/login" class="bg-brand hover:bg-red-600 text-white font-bold py-4 px-8 rounded-custom uppercase tracking-widest transition-all text-center flex items-center justify-center">
+            Link Node
+          </a>
+<a href="/dashboard" class="glass text-gray-300 hover:text-white hover:border-brand/50 font-bold py-4 px-8 rounded-custom uppercase tracking-widest transition-all text-center flex items-center justify-center border border-white/10">
+            Guest Bypass
+          </a>
+</div>
+</div>
+</div>
+</section>
+<!-- END: CallToAction -->
+<!-- BEGIN: Footer -->
+<footer class="py-12 border-t border-white/5 glass" data-purpose="main-footer" id="footer">
+<div class="container mx-auto px-6">
+<div class="flex flex-col md:flex-row justify-between items-center gap-8">
+<div>
+<span class="text-lg font-bold tracking-tighter uppercase glow-text">EMO<span class="text-brand">DETECTION</span></span>
+<p class="text-xs text-gray-600 mt-2">© 2077 Neural Systems Corp. All rights reserved.</p>
+</div>
+<div class="flex gap-8 text-xs font-mono uppercase text-gray-500">
+<a class="hover:text-brand" href="#">Privacy Node</a>
+<a class="hover:text-brand" href="#">Security Grid</a>
+<a class="hover:text-brand" href="#">System Status</a>
+</div>
+<div class="flex gap-4">
+<div class="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center text-gray-400 hover:border-brand hover:text-brand transition-colors cursor-pointer">
+<svg class="w-4 h-4" fill="currentColor" viewbox="0 0 24 24"><path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.84 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"></path></svg>
+</div>
+<div class="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center text-gray-400 hover:border-brand hover:text-brand transition-colors cursor-pointer">
+<svg class="w-4 h-4" fill="currentColor" viewbox="0 0 24 24"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"></path></svg>
+</div>
+</div>
+</div>
+</div>
+</footer>
+<!-- END: Footer -->
+<script data-purpose="canvas-setup">
+    const canvas = document.getElementById('analyticsCanvas');
+    if (canvas) {
+      const ctx = canvas.getContext('2d');
+      let points = [];
+      const numPoints = 100;
+      let offset = 0;
+
+      function resize() {
+        canvas.width = canvas.parentElement.offsetWidth;
+        canvas.height = canvas.parentElement.offsetHeight;
+      }
+
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        ctx.beginPath();
+        ctx.strokeStyle = '#ff4d00';
+        ctx.lineWidth = 2;
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = '#ff4d00';
+
+        for (let i = 0; i < numPoints; i++) {
+          const x = (i / numPoints) * canvas.width;
+          const y = (canvas.height / 2) + Math.sin(i * 0.2 + offset) * 20 + Math.cos(i * 0.1 - offset * 1.5) * 15;
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        
+        ctx.stroke();
+        
+        // Second line
+        ctx.beginPath();
+        ctx.strokeStyle = 'rgba(239, 68, 68, 0.4)';
+        ctx.lineWidth = 1;
+        for (let i = 0; i < numPoints; i++) {
+          const x = (i / numPoints) * canvas.width;
+          const y = (canvas.height / 2) + Math.cos(i * 0.15 + offset * 0.8) * 40;
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+
+        offset += 0.05;
+        requestAnimationFrame(animate);
+      }
+
+      window.addEventListener('resize', resize);
+      resize();
+      animate();
+    }
+  </script>
+<script data-purpose="event-handlers">
+    // Smooth scroll
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        document.querySelector(this.getAttribute('href')).scrollIntoView({
+          behavior: 'smooth'
+        });
+      });
+    });
+
+    // Simple interaction for CTA
+    const ctaButton = document.querySelector('[data-purpose="cta-button"]');
+    if (ctaButton) {
+      ctaButton.addEventListener('mouseenter', () => {
+        console.log('Scanning protocol initialized...');
+      });
+    }
+  </script>
+</body></html>

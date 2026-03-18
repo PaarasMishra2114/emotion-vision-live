@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Emo Detection - Neural Access</title>
+<!-- Google Fonts: Space Grotesk -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration -->
+<script data-purpose="tailwind-config">
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: '#ff4d00',
+            darkbg: '#050505',
+          },
+          fontFamily: {
+            sans: ['Space Grotesk', 'sans-serif'],
+          },
+          borderRadius: {
+            'custom': '1rem', // ROUND_FOUR implementation
+          },
+          animation: {
+            'scan': 'scan 3s ease-in-out infinite',
+            'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+          },
+          keyframes: {
+            scan: {
+              '0%, 100%': { transform: 'translateY(0)', opacity: '0.2' },
+              '50%': { transform: 'translateY(120px)', opacity: '1' },
+            }
+          }
+        }
+      }
+    }
+  </script>
+<!-- Custom Styles -->
+<style data-purpose="background-effects">
+    body {
+      background-color: #050505;
+      background-image: 
+        linear-gradient(rgba(255, 77, 0, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 77, 0, 0.05) 1px, transparent 1px);
+      background-size: 50px 50px;
+      overflow: hidden;
+    }
+    .glass-morphism {
+      background: rgba(15, 15, 15, 0.6);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 77, 0, 0.2);
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
+    }
+    .glow-border:focus-within {
+      border-color: #ff4d00;
+      box-shadow: 0 0 15px rgba(255, 77, 0, 0.3);
+    }
+    .fingerprint-svg {
+      fill: none;
+      stroke: #ff4d00;
+      stroke-width: 2;
+      stroke-linecap: round;
+      opacity: 0.6;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center font-sans text-gray-100">
+<!-- BEGIN: Main Login Container -->
+<main class="relative z-10 w-full max-w-md px-6 py-12" data-purpose="login-interface">
+<!-- Background Glow -->
+<div class="absolute -top-24 -left-24 w-64 h-64 bg-primary/20 rounded-full blur-[100px] pointer-events-none"></div>
+<div class="absolute -bottom-24 -right-24 w-64 h-64 bg-primary/10 rounded-full blur-[100px] pointer-events-none"></div>
+<div class="glass-morphism rounded-custom p-8 md:p-10 flex flex-col items-center">
+<!-- BEGIN: Header Section -->
+<header class="text-center mb-8" data-purpose="header">
+<h1 class="text-3xl font-bold tracking-tighter text-white mb-2">NEURAL ACCESS</h1>
+<p class="text-xs uppercase tracking-[0.3em] text-primary/80 font-medium">Emo Detection System v4.0</p>
+</header>
+<!-- END: Header Section -->
+<!-- BEGIN: Biometric Scanning Visual -->
+<section class="relative mb-10 group" data-purpose="biometric-visual">
+<div class="w-32 h-32 flex items-center justify-center border border-primary/30 rounded-full relative overflow-hidden bg-black/40">
+<!-- Scanning Line -->
+<div class="absolute top-0 left-0 w-full h-0.5 bg-primary shadow-[0_0_10px_#ff4d00] z-20 animate-scan"></div>
+<!-- Fingerprint Icon -->
+<svg class="w-16 h-16 fingerprint-svg animate-pulse-slow" viewbox="0 0 24 24">
+<path d="M12 11c.3 0 .5.2.5.5v2.3c0 .3-.2.5-.5.5s-.5-.2-.5-.5v-2.3c0-.3.2-.5.5-.5zM12 7c2.5 0 4.5 2 4.5 4.5v1.3c0 2.2-1.4 4.1-3.4 4.8-.3.1-.6-.1-.7-.4s.1-.6.4-.7c1.5-.5 2.6-1.9 2.6-3.6v-1.3c0-1.9-1.6-3.5-3.5-3.5s-3.5 1.6-3.5 3.5v1.3c0 1.1-.3 2.1-.8 3-.1.3-.5.4-.7.3-.3-.1-.4-.5-.3-.7.4-.7.7-1.6.7-2.5v-1.3C8.5 9 10.1 7 12 7z"></path>
+<path d="M12 3c4.7 0 8.5 3.8 8.5 8.5v1.3c0 3.3-1.9 6.2-4.9 7.6-.3.1-.6 0-.7-.3-.1-.3 0-.6.3-.7 2.6-1.2 4.3-3.7 4.3-6.6v-1.3C19.5 7.6 16.1 4 12 4S4.5 7.6 4.5 11.5v1.3c0 1.8-.4 3.5-1.1 5.1-.1.3-.4.4-.7.3s-.4-.4-.3-.7c.6-1.4 1-2.9 1-4.7v-1.3C3.5 6.8 7.3 3 12 3z"></path>
+<path d="M12 18.5c-.3 0-.5-.2-.5-.5s.2-.5.5-.5 1.1-.1 1.6-.4c.3-.1.6 0 .7.3.1.3 0 .6-.3.7-.6.4-1.3.4-2 .4z"></path>
+</svg>
+</div>
+<div class="absolute -inset-1 border border-primary/10 rounded-full scale-110"></div>
+</section>
+<!-- END: Biometric Scanning Visual -->
+<!-- BEGIN: Authentication Form -->
+<form action="/dashboard" class="w-full space-y-6" data-purpose="auth-form">
+<div class="space-y-4">
+<!-- Operator ID Input -->
+<div class="group">
+<label class="block text-[10px] uppercase tracking-widest text-gray-400 mb-1 ml-1" for="operator-id">Operator ID</label>
+<div class="relative glow-border border border-white/10 rounded-lg transition-all duration-300 overflow-hidden bg-black/20">
+<input class="w-full bg-transparent border-none text-sm py-3 px-4 focus:ring-0 placeholder:text-gray-600 text-white" id="operator-id" placeholder="OP-XXXX-882" type="text"/>
+</div>
+</div>
+<!-- Neural Link Key Input -->
+<div class="group">
+<label class="block text-[10px] uppercase tracking-widest text-gray-400 mb-1 ml-1" for="neural-key">Neural Link Key</label>
+<div class="relative glow-border border border-white/10 rounded-lg transition-all duration-300 overflow-hidden bg-black/20">
+<input class="w-full bg-transparent border-none text-sm py-3 px-4 focus:ring-0 placeholder:text-gray-600 text-white" id="neural-key" placeholder="••••••••••••" type="password"/>
+</div>
+</div>
+</div>
+<button class="w-full bg-primary hover:bg-orange-600 text-white font-bold py-3 px-4 rounded-lg transition-all duration-300 shadow-[0_0_20px_rgba(255,77,0,0.4)] hover:shadow-[0_0_30px_rgba(255,77,0,0.6)] uppercase tracking-widest text-sm" type="submit">
+          Initiate Link
+        </button>
+</form>
+<!-- END: Authentication Form -->
+<!-- BEGIN: Footer Actions -->
+<footer class="mt-8 flex flex-col items-center gap-4" data-purpose="footer-links">
+<button class="text-[10px] uppercase tracking-widest text-primary/60 hover:text-primary transition-colors duration-300">
+          Emergency Reset
+        </button>
+<div class="flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
+<span class="text-[9px] uppercase tracking-tighter text-gray-500">Node Status: Operational</span>
+</div>
+</footer>
+<!-- END: Footer Actions -->
+</div>
+<!-- Interface Deco Elements -->
+<div class="mt-6 flex justify-between px-2 opacity-30">
+<div class="text-[8px] text-primary">SECURE_LAYER_7_ACTIVE</div>
+<div class="text-[8px] text-primary">ENCRYPT_AES_256</div>
+</div>
+</main>
+<!-- END: Main Login Container -->
+<!-- BEGIN: Logic Scripts -->
+<script data-purpose="form-interactivity">
+    // Subtle interaction logic if needed
+    document.querySelector('form').addEventListener('submit', (e) => {
+      console.log('Neural link initiation sequence started...');
+      // Future implementation for scanning feedback
+    });
+  </script>
+<!-- END: Logic Scripts -->
+</body></html>

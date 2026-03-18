@@ -1,23 +1,17 @@
-export const EMOTIONS = ['angry', 'disgust', 'fear', 'happy', 'sad', 'surprise', 'neutral'] as const;
+export const EMOTIONS = ['angry', 'happy', 'sad', 'neutral'] as const;
 export type EmotionKey = typeof EMOTIONS[number];
 
 export const EMOTION_COLORS: Record<EmotionKey, string> = {
   angry: 'hsl(0, 85%, 55%)',
-  disgust: 'hsl(120, 50%, 35%)',
-  fear: 'hsl(270, 60%, 50%)',
   happy: 'hsl(45, 100%, 55%)',
   sad: 'hsl(210, 70%, 45%)',
-  surprise: 'hsl(30, 100%, 55%)',
   neutral: 'hsl(200, 20%, 50%)',
 };
 
 export const EMOTION_HSL: Record<EmotionKey, string> = {
   angry: '0 85% 55%',
-  disgust: '120 50% 35%',
-  fear: '270 60% 50%',
   happy: '45 100% 55%',
   sad: '210 70% 45%',
-  surprise: '30 100% 55%',
   neutral: '200 20% 50%',
 };
 
@@ -33,11 +27,8 @@ export interface FaceData {
 export interface HistoryPoint {
   t: number;
   angry: number;
-  disgust: number;
-  fear: number;
   happy: number;
   sad: number;
-  surprise: number;
   neutral: number;
 }
 

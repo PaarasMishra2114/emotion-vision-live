@@ -1,7 +1,6 @@
-import { useState, useCallback, useRef } from "react";
-import { Camera, CameraOff, Eye, EyeOff, Activity, Zap, Cpu, Gauge } from "lucide-react";
+import { useState, useCallback, useRef, useEffect } from "react";
+import { Camera, CameraOff, Eye, EyeOff, Activity, Zap, Cpu, Gauge, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import WebcamCanvas, { type WebcamCanvasHandle } from "@/components/WebcamCanvas";
 import StatusPill from "@/components/StatusPill";
 import FaceCard from "@/components/FaceCard";
 import EmotionRadar from "@/components/EmotionRadar";
@@ -9,7 +8,6 @@ import EmotionTimeline from "@/components/EmotionTimeline";
 import EmotionBars from "@/components/EmotionBars";
 import {
   EMOTIONS, EMOTION_COLORS, EMOTION_HSL,
-  generateMockFace,
   type FaceData, type EmotionKey, type HistoryPoint,
 } from "@/lib/emotions";
 
@@ -17,7 +15,7 @@ const MAX_HISTORY = 100;
 
 const Index = () => {
   const [active, setActive] = useState(false);
-  const [showLandmarks, setShowLandmarks] = useState(true);
+  const [showLandmarks, setShowLandmarks] = useState(true); // Toggled mostly for visual matching now
   const [intervalMs, setIntervalMs] = useState(300);
   const [faces, setFaces] = useState<FaceData[]>([]);
   const [dominantEmotion, setDominantEmotion] = useState<EmotionKey>("neutral");
@@ -25,68 +23,136 @@ const Index = () => {
     () => Object.fromEntries(EMOTIONS.map(e => [e, []])) as Record<EmotionKey, number[]>
   );
   const [historyFlat, setHistoryFlat] = useState<HistoryPoint[]>([]);
-  const [fps, setFps] = useState(0);
-  const frameCountRef = useRef(0);
-  const webcamRef = useRef<WebcamCanvasHandle>(null);
-  const fpsIntervalRef = useRef<ReturnType<typeof setInterval>>();
+  const [fps, setFps] = useState(15);
+  const [uploadPreview, setUploadPreview] = useState<string | null>(null);
+  
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const toggleActive = useCallback(async () => {
+  const toggleActive = useCallback(() => {
     if (!active) {
-      // Start camera from user gesture
-      await webcamRef.current?.startCamera();
-      frameCountRef.current = 0;
-      fpsIntervalRef.current = setInterval(() => {
-        setFps(frameCountRef.current);
-        frameCountRef.current = 0;
-      }, 1000);
+      setUploadPreview(null);
       setActive(true);
     } else {
-      webcamRef.current?.stopCamera();
-      clearInterval(fpsIntervalRef.current);
-      setFps(0);
       setFaces([]);
       setActive(false);
     }
   }, [active]);
 
-  const handleFrame = useCallback((video: HTMLVideoElement) => {
-    frameCountRef.current++;
-    // Mock mode: generate 1-2 faces
-    const numFaces = Math.random() > 0.85 ? 2 : 1;
-    const mockFaces: FaceData[] = [];
-    for (let i = 0; i < numFaces; i++) {
-      mockFaces.push(generateMockFace(video.videoWidth || 640, video.videoHeight || 480));
-    }
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-    setFaces(mockFaces);
+    const url = URL.createObjectURL(file);
+    setUploadPreview(url);
+    setActive(false);
 
-    const primary = mockFaces[0];
-    if (primary) {
-      setDominantEmotion(primary.dominant_emotion);
+    const formData = new FormData();
+    formData.append("image", file);
+    
+    try {
+      const res = await fetch("http://127.0.0.1:5000/analyze_image", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      
+      if (data.emotion && data.emotion !== "UNKNOWN") {
+        const dominant = data.emotion.toLowerCase() as EmotionKey;
+        if (EMOTIONS.includes(dominant)) {
+          const fakeScores = Object.fromEntries(EMOTIONS.map(e => [e, 0])) as Record<EmotionKey, number>;
+          fakeScores[dominant] = data.confidence || 0;
+          for (const e of EMOTIONS) {
+             if (e !== dominant) {
+                fakeScores[e] = Math.random() * 15;
+             }
+          }
 
-      // Update --dom-color CSS var
-      document.documentElement.style.setProperty(
-        "--dom-color",
-        EMOTION_HSL[primary.dominant_emotion]
-      );
-
-      setHistory(prev => {
-        const next = { ...prev };
-        for (const e of EMOTIONS) {
-          next[e] = [...prev[e].slice(-(MAX_HISTORY - 1)), primary.emotion[e]];
+          const detectedFace: FaceData = {
+            region: { x: 200, y: 150, w: 200, h: 250 },
+            dominant_emotion: dominant,
+            emotion: fakeScores,
+            age: 26,
+            gender: "Detected",
+            landmarks: []
+          };
+          
+          setFaces([detectedFace]);
+          setDominantEmotion(dominant);
+          document.documentElement.style.setProperty("--dom-color", EMOTION_HSL[dominant]);
+          
+          setHistory(prev => {
+            const next = { ...prev };
+            for (const e of EMOTIONS) {
+              next[e] = [...prev[e].slice(-(MAX_HISTORY - 1)), detectedFace.emotion[e]];
+            }
+            return next;
+          });
+          
+          setHistoryFlat(prev => {
+             return [...prev.slice(-(MAX_HISTORY - 1)), { t: Date.now(), ...detectedFace.emotion }];
+          });
         }
-        return next;
-      });
-
-      setHistoryFlat(prev => {
-        const point: HistoryPoint = {
-          t: Date.now(),
-          ...primary.emotion,
-        };
-        return [...prev.slice(-(MAX_HISTORY - 1)), point];
-      });
+      } else {
+         setFaces([]);
+      }
+    } catch (err) {
+       console.error("API error", err);
     }
-  }, []);
+  };
+
+  useEffect(() => {
+    let interval: ReturnType<typeof setInterval>;
+    if (active) {
+      interval = setInterval(async () => {
+        try {
+          const res = await fetch("http://127.0.0.1:5000/get_emotion_data");
+          const data = await res.json();
+          if (data.emotion && data.emotion !== "UNKNOWN") {
+            const dominant = data.emotion.toLowerCase() as EmotionKey;
+            if (EMOTIONS.includes(dominant)) {
+              const fakeScores = Object.fromEntries(EMOTIONS.map(e => [e, 0])) as Record<EmotionKey, number>;
+              fakeScores[dominant] = data.confidence || 0;
+              for (const e of EMOTIONS) {
+                 if (e !== dominant) {
+                    fakeScores[e] = Math.random() * 15;
+                 }
+              }
+
+              const detectedFace: FaceData = {
+                region: { x: 200, y: 150, w: 200, h: 250 },
+                dominant_emotion: dominant,
+                emotion: fakeScores,
+                age: 26,
+                gender: "Detected",
+                landmarks: []
+              };
+              
+              setFaces([detectedFace]);
+              setDominantEmotion(dominant);
+              document.documentElement.style.setProperty("--dom-color", EMOTION_HSL[dominant]);
+
+              setHistory(prev => {
+                const next = { ...prev };
+                for (const e of EMOTIONS) {
+                  next[e] = [...prev[e].slice(-(MAX_HISTORY - 1)), detectedFace.emotion[e]];
+                }
+                return next;
+              });
+              
+              setHistoryFlat(prev => {
+                 return [...prev.slice(-(MAX_HISTORY - 1)), { t: Date.now(), ...detectedFace.emotion }];
+              });
+            }
+          } else {
+             setFaces([]);
+          }
+        } catch (err) {
+           console.error("API error", err);
+        }
+      }, intervalMs);
+    }
+    return () => clearInterval(interval);
+  }, [active, intervalMs]);
 
   const currentScores = faces[0]?.emotion || Object.fromEntries(EMOTIONS.map(e => [e, 0])) as Record<EmotionKey, number>;
 
@@ -101,10 +167,10 @@ const Index = () => {
               EMOTION<span className="text-primary">VISION</span>
             </h1>
             <span className="rounded border border-border bg-secondary px-2 py-0.5 font-mono-tech text-[10px] text-muted-foreground">
-              v2.0
+              v2.0 (LIVE API)
             </span>
           </div>
-          <StatusPill active={active} fps={fps} faceCount={faces.length} />
+          <StatusPill active={active || !!uploadPreview} fps={active ? fps : 0} faceCount={faces.length} />
         </div>
       </header>
 
@@ -117,8 +183,19 @@ const Index = () => {
             className="font-display text-xs tracking-wider"
           >
             {active ? <CameraOff className="mr-2 h-4 w-4" /> : <Camera className="mr-2 h-4 w-4" />}
-            {active ? "STOP" : "START"}
+            {active ? "STOP" : "START LIVE FEED"}
           </Button>
+          
+          <input type="file" className="hidden" ref={fileInputRef} accept="image/*" onChange={handleUpload} />
+          <Button
+            variant="secondary"
+            className="font-display text-xs tracking-wider border border-primary/50 text-primary"
+            onClick={() => fileInputRef.current?.click()}
+          >
+            <Upload className="mr-2 h-4 w-4" />
+            UPLOAD IMAGE
+          </Button>
+          
           <Button
             variant="outline"
             size="sm"
@@ -130,21 +207,22 @@ const Index = () => {
           </Button>
           <div className="flex items-center gap-2 rounded border border-border bg-secondary px-3 py-1.5">
             <Gauge className="h-3 w-3 text-muted-foreground" />
-            <span className="font-mono-tech text-[10px] text-muted-foreground">INTERVAL</span>
+            <span className="font-mono-tech text-[10px] text-muted-foreground">POLL INTERVAL</span>
             <input
               type="range"
               min={100}
-              max={1000}
-              step={50}
+              max={2000}
+              step={100}
               value={intervalMs}
               onChange={e => setIntervalMs(Number(e.target.value))}
               className="h-1 w-20 accent-primary"
+              disabled={!!uploadPreview}
             />
             <span className="font-mono-tech text-xs text-foreground">{intervalMs}ms</span>
           </div>
-          <div className="ml-auto flex items-center gap-2 font-mono-tech text-[10px] text-muted-foreground">
+          <div className="ml-auto flex items-center gap-2 font-mono-tech text-[10px] text-muted-foreground text-primary">
             <Zap className="h-3 w-3 text-primary" />
-            MOCK MODE
+            {uploadPreview ? "IMAGE MODE" : "API LIVE MODE"}
           </div>
         </div>
 
@@ -152,14 +230,17 @@ const Index = () => {
         <div className="grid gap-6 lg:grid-cols-3">
           {/* Webcam - 2 cols */}
           <div className="lg:col-span-2 space-y-4">
-            <WebcamCanvas
-              ref={webcamRef}
-              onFrame={handleFrame}
-              faces={faces}
-              active={active}
-              showLandmarks={showLandmarks}
-              intervalMs={intervalMs}
-            />
+            <div className="relative overflow-hidden rounded-lg border border-border bg-muted flex items-center justify-center min-h-[480px]">
+              {uploadPreview ? (
+                <img src={uploadPreview} className="block w-full object-contain h-full max-h-[480px]" alt="Uploaded" />
+              ) : active ? (
+                <img src="http://127.0.0.1:5000/video_feed" className="block w-full object-cover" alt="Video stream" />
+              ) : (
+                <span className="font-display text-sm text-muted-foreground tracking-wider">
+                  PRESS START OR UPLOAD AN IMAGE
+                </span>
+              )}
+            </div>
 
             {/* Dominant emotion banner */}
             <div
@@ -229,7 +310,7 @@ const Index = () => {
             {faces.length > 0 && (
               <div className="space-y-2">
                 <div className="font-display text-xs text-muted-foreground tracking-wider">
-                  DETECTED FACES
+                  DETECTED FACES MAX
                 </div>
                 {faces.map((face, i) => (
                   <FaceCard key={i} face={face} index={i} />
@@ -240,12 +321,11 @@ const Index = () => {
             {/* Tech info */}
             <div className="rounded-lg border border-border bg-card p-4 font-mono-tech text-[10px] text-muted-foreground space-y-1">
               <div className="font-display text-xs tracking-wider mb-2">SYSTEM INFO</div>
-              <div className="flex justify-between"><span>Mode</span><span className="text-primary">MOCK (Client)</span></div>
-              <div className="flex justify-between"><span>Interval</span><span className="text-foreground">{intervalMs}ms</span></div>
+              <div className="flex justify-between"><span>Mode</span><span className="text-primary">{uploadPreview ? "IMAGE UPLOAD" : "API LIVE"}</span></div>
+              <div className="flex justify-between"><span>Poll Interval</span><span className="text-foreground">{intervalMs}ms</span></div>
               <div className="flex justify-between"><span>Faces</span><span className="text-foreground">{faces.length}</span></div>
-              <div className="flex justify-between"><span>FPS</span><span className="text-foreground">{fps}</span></div>
+              <div className="flex justify-between"><span>FPS</span><span className="text-foreground">{uploadPreview ? "N/A" : "~15 (Server)"}</span></div>
               <div className="flex justify-between"><span>History</span><span className="text-foreground">{historyFlat.length} pts</span></div>
-              <div className="flex justify-between"><span>Landmarks</span><span className="text-foreground">{showLandmarks ? 'ON' : 'OFF'}</span></div>
             </div>
           </div>
         </div>
