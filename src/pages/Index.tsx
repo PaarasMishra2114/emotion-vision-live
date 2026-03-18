@@ -1,7 +1,7 @@
 import { useState, useCallback, useRef } from "react";
 import { Camera, CameraOff, Eye, EyeOff, Activity, Zap, Cpu, Gauge } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import WebcamCanvas from "@/components/WebcamCanvas";
+import WebcamCanvas, { type WebcamCanvasHandle } from "@/components/WebcamCanvas";
 import StatusPill from "@/components/StatusPill";
 import FaceCard from "@/components/FaceCard";
 import EmotionRadar from "@/components/EmotionRadar";
