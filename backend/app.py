@@ -133,7 +133,7 @@ def analyze_image():
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     faces = []
     if face_cascade is not None:
-        faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
+        faces = face_cascade.detectMultiScale(gray, scaleFactor=1.05, minNeighbors=3, minSize=(30, 30))
     
     detected_emotion = "UNKNOWN"
     detected_confidence = 0.0

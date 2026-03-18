@@ -12,6 +12,7 @@ import {
 } from "@/lib/emotions";
 
 const MAX_HISTORY = 100;
+const API_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:5000";
 
 const Index = () => {
   const [active, setActive] = useState(false);
@@ -50,7 +51,7 @@ const Index = () => {
     formData.append("image", file);
     
     try {
-      const res = await fetch("http://127.0.0.1:5000/analyze_image", {
+      const res = await fetch(`${API_URL}/analyze_image`, {
         method: "POST",
         body: formData,
       });
@@ -105,7 +106,7 @@ const Index = () => {
     if (active) {
       interval = setInterval(async () => {
         try {
-          const res = await fetch("http://127.0.0.1:5000/get_emotion_data");
+          const res = await fetch(`${API_URL}/get_emotion_data`);
           const data = await res.json();
           if (data.emotion && data.emotion !== "UNKNOWN") {
             const dominant = data.emotion.toLowerCase() as EmotionKey;
@@ -234,7 +235,7 @@ const Index = () => {
               {uploadPreview ? (
                 <img src={uploadPreview} className="block w-full object-contain h-full max-h-[480px]" alt="Uploaded" />
               ) : active ? (
-                <img src="http://127.0.0.1:5000/video_feed" className="block w-full object-cover" alt="Video stream" />
+                <img src={`${API_URL}/video_feed`} className="block w-full object-cover" alt="Video stream" />
               ) : (
                 <span className="font-display text-sm text-muted-foreground tracking-wider">
                   PRESS START OR UPLOAD AN IMAGE
