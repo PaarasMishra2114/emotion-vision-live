@@ -153,6 +153,7 @@ const Index = () => {
           {/* Webcam - 2 cols */}
           <div className="lg:col-span-2 space-y-4">
             <WebcamCanvas
+              ref={webcamRef}
               onFrame={handleFrame}
               faces={faces}
               active={active}
