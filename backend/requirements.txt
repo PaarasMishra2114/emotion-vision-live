@@ -1,7 +1,7 @@
 flask
 numpy
-opencv-python-headless
+opencv-contrib-python-headless
 gunicorn
 flask-cors
 
-# Windows pipeline fix
+# Added contrib module
