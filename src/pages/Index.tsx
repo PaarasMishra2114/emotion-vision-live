@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { Camera, CameraOff, Eye, EyeOff, Activity, Zap, Cpu, Gauge, Upload } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import StatusPill from "@/components/StatusPill";
 import FaceCard from "@/components/FaceCard";
@@ -164,6 +165,7 @@ const Index = () => {
       const formData = new FormData();
       formData.append("image", blob, "frame.jpg");
       try {
+        toast.success("Analyzing capture...", { icon: <Zap className="h-4 w-4 text-primary" /> });
         const res = await fetch(`${API_URL}/analyze_image`, {
           method: "POST",
           body: formData,
@@ -171,6 +173,7 @@ const Index = () => {
         const data = await res.json();
         processResponse(data);
       } catch (err) {
+        toast.error("Capture analysis failed.");
         console.error("API error on manual capture", err);
       }
     }, 'image/jpeg', 0.9);

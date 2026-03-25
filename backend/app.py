@@ -20,16 +20,22 @@ current_confidence = 0.0
 lock = threading.Lock()
 
 def load_face_detector():
-    if os.path.exists(CASC_PATH):
-        cascade_path = CASC_PATH
-    else:
-        cascade_path = os.path.join(cv2.data.haarcascades, "haarcascade_frontalface_default.xml")
-        
-    face_cascade = cv2.CascadeClassifier(cascade_path)
-    if face_cascade.empty():
-        print(f"❌ Error loading Haar Cascade from {cascade_path}")
-        return None
-    return face_cascade
+    # Try alt2 first as it is more robust, then default
+    cascade_options = [
+        "haarcascade_frontalface_alt2.xml",
+        "haarcascade_frontalface_alt.xml",
+        "haarcascade_frontalface_default.xml"
+    ]
+    
+    for opt in cascade_options:
+        cascade_path = os.path.join(cv2.data.haarcascades, opt)
+        face_cascade = cv2.CascadeClassifier(cascade_path)
+        if not face_cascade.empty():
+            print(f"✅ Loaded Haar Cascade: {opt}")
+            return face_cascade
+            
+    print(f"❌ Error: Could not load any Haar Cascade")
+    return None
 
 def load_emotion_model():
     if not os.path.exists(MODEL_PATH) or not os.path.exists(CLASS_NAMES_PATH):
@@ -63,10 +69,14 @@ def generate_frames():
             
         # Analyze Frame
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        
+        # Improvement: Histogram Equalization for better detection in varying light
+        gray = cv2.equalizeHist(gray)
+        
         faces = []
         if face_cascade is not None:
-            # Lowered minNeighbors to 3 for higher sensitivity as requested
-            faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=3, minSize=(30, 30))
+            # Increased minNeighbors to 5 to reduce false positives (like posters)
+            faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(40, 40))
 
         detected_emotion = "UNKNOWN"
         detected_confidence = 0.0
@@ -140,9 +150,14 @@ def analyze_image():
         return error_res, 400
         
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    
+    # Improvement: Histogram Equalization for API calls too
+    gray = cv2.equalizeHist(gray)
+    
     faces = []
     if face_cascade is not None:
-        faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=3, minSize=(30, 30))
+        # Higher minNeighbors and minSize to focus on real faces
+        faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(50, 50))
         print(f"🔍 analyze_image API: Detected {len(faces)} faces")
     
     detected_emotion = "UNKNOWN"
