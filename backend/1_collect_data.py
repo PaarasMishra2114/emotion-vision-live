@@ -8,7 +8,7 @@ import numpy as np # pyre-ignore
 EMOTIONS = ["angry", "happy", "neutral", "sad"]
 SAVE_DIR = "dataset/train"
 IMG_SIZE = 224
-IMAGES_PER_EMOTION = 40  # how many images to capture per emotion
+IMAGES_PER_EMOTION = 50  # how many images to capture per emotion
 
 face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
 

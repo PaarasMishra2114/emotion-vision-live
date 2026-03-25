@@ -4,10 +4,10 @@ import cv2 # pyre-ignore
 import numpy as np # pyre-ignore
 
 # -------- SETTINGS --------
-DATA_DIR = "dataset/train"
+DATA_DIR = r"c:\Users\mishr\OneDrive\Desktop\dataset\train"
 MODEL_DIR = "models"
 MODEL_PATH = os.path.join(MODEL_DIR, "lbph_model.yml")
-IMG_SIZE = (224, 224)  # LBPH prefers arrays representing images, resizing to uniform size
+IMG_SIZE = (48, 48)  # FER2013 standard size
 
 def load_images_and_labels():
     faces = []
@@ -27,7 +27,11 @@ def load_images_and_labels():
         class_names.append(emotion)
         print(f"Loading '{emotion}' images... (ID: {label_id})")
         
+        loaded_count = 0
         for img_name in os.listdir(emotion_dir):
+            if loaded_count >= 250:  # Limit images per emotion for GitHub size limits (under 100MB)
+                break
+                
             if img_name.lower().endswith(('.jpg', '.jpeg', '.png')):
                 img_path = os.path.join(emotion_dir, img_name)
                 # Read as grayscale for LBPH
@@ -37,6 +41,7 @@ def load_images_and_labels():
                     img = cv2.resize(img, IMG_SIZE)
                     faces.append(img)
                     labels.append(label_id)
+                    loaded_count += 1
         label_id = label_id + 1  # pyre-ignore
         
     return faces, np.array(labels), class_names

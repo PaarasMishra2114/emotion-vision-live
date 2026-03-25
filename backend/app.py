@@ -8,10 +8,11 @@ import threading
 app = Flask(__name__)
 
 # Core Model Paths
-MODEL_PATH = "models/lbph_model.yml"
-CLASS_NAMES_PATH = "models/class_names.txt"
-CASC_PATH = "haarcascade_frontalface_default.xml"
-IMG_SIZE = (224, 224)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+MODEL_PATH = os.path.join(BASE_DIR, "models", "lbph_model.yml")
+CLASS_NAMES_PATH = os.path.join(BASE_DIR, "models", "class_names.txt")
+CASC_PATH = os.path.join(BASE_DIR, "haarcascade_frontalface_default.xml")
+IMG_SIZE = (48, 48)
 
 # Global variables to pass state between video loop and API endpoint
 current_emotion = "UNKNOWN"
@@ -19,7 +20,11 @@ current_confidence = 0.0
 lock = threading.Lock()
 
 def load_face_detector():
-    cascade_path = cv2.data.haarcascades + CASC_PATH
+    if os.path.exists(CASC_PATH):
+        cascade_path = CASC_PATH
+    else:
+        cascade_path = os.path.join(cv2.data.haarcascades, "haarcascade_frontalface_default.xml")
+        
     face_cascade = cv2.CascadeClassifier(cascade_path)
     if face_cascade.empty():
         print(f"❌ Error loading Haar Cascade from {cascade_path}")
@@ -60,10 +65,14 @@ def generate_frames():
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         faces = []
         if face_cascade is not None:
-            faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
+            # Lowered minNeighbors to 3 for higher sensitivity as requested
+            faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=3, minSize=(30, 30))
 
         detected_emotion = "UNKNOWN"
         detected_confidence = 0.0
+        
+        if len(faces) > 0:
+            print(f"DEBUG: Found {len(faces)} face(s) for live analysis.")
 
         for (x, y, w, h) in faces:
             # Draw bounding box but sci-fi style (Alien Orange Box)
@@ -133,7 +142,8 @@ def analyze_image():
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     faces = []
     if face_cascade is not None:
-        faces = face_cascade.detectMultiScale(gray, scaleFactor=1.05, minNeighbors=3, minSize=(30, 30))
+        faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=3, minSize=(30, 30))
+        print(f"🔍 analyze_image API: Detected {len(faces)} faces")
     
     detected_emotion = "UNKNOWN"
     detected_confidence = 0.0

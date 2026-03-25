@@ -148,6 +148,34 @@ const Index = () => {
     return () => clearInterval(interval);
   }, [active, intervalMs]);
 
+  const handleManualCapture = useCallback(async () => {
+    if (!videoRef.current || !canvasRef.current || !active) return;
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    canvas.width = video.videoWidth || 640;
+    canvas.height = video.videoHeight || 480;
+    if (canvas.width === 0) return;
+    
+    const ctx = canvas.getContext('2d');
+    ctx?.drawImage(video, 0, 0, canvas.width, canvas.height);
+    
+    canvas.toBlob(async (blob) => {
+      if (!blob) return;
+      const formData = new FormData();
+      formData.append("image", blob, "frame.jpg");
+      try {
+        const res = await fetch(`${API_URL}/analyze_image`, {
+          method: "POST",
+          body: formData,
+        });
+        const data = await res.json();
+        processResponse(data);
+      } catch (err) {
+        console.error("API error on manual capture", err);
+      }
+    }, 'image/jpeg', 0.9);
+  }, [active]);
+
   const currentScores = faces[0]?.emotion || Object.fromEntries(EMOTIONS.map(e => [e, 0])) as Record<EmotionKey, number>;
 
   return (
@@ -179,6 +207,17 @@ const Index = () => {
             {active ? <CameraOff className="mr-2 h-4 w-4" /> : <Camera className="mr-2 h-4 w-4" />}
             {active ? "STOP" : "START LIVE FEED"}
           </Button>
+
+          {active && (
+            <Button
+              variant="default"
+              onClick={handleManualCapture}
+              className="font-display text-xs tracking-wider bg-primary hover:bg-primary/80"
+            >
+              <Zap className="mr-2 h-4 w-4" />
+              CAPTURE / SCAN
+            </Button>
+          )}
           
           <input type="file" className="hidden" ref={fileInputRef} accept="image/*" onChange={handleUpload} />
           <Button
